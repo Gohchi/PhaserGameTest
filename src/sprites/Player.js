@@ -2,16 +2,17 @@ import Phaser from 'phaser'
 import Entity from './Entity'
 
 import PlayerLaser from './PlayerLaser'
+import { type } from 'os';
 
 export default class Player extends Entity {
   constructor (scene, x, y, key) {
     super(scene, x, y, key, 'Player')
+    this.setData('score', 0)
     this.setData('speed', 200)
     this.setData('isShooting', false)
     this.setData('timerShootDelay', 10)
     this.setData('timerShootTick', this.getData('timerShootDelay') - 1)
   }
-
   moveUp () {
     this.body.velocity.y = -this.getData('speed')
   }
@@ -30,7 +31,8 @@ export default class Player extends Entity {
       // go to game over scene
       delay: 1000,
       callback: function () {
-        this.scene.scene.start('SceneGameOver')
+        let finalScore = this.getData('score')
+        this.scene.scene.start('SceneGameOver', finalScore)
       },
       callbackScope: this,
       loop: false

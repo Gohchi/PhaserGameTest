@@ -1,17 +1,19 @@
-class SceneMainMenu extends Phaser.Scene {
+import Phaser from 'phaser'
+
+export default class SceneMainMenu extends Phaser.Scene {
   constructor () {
     super({ key: 'SceneMainMenu' })
   }
 
   preload () {
-    this.load.image('sprBg0', 'content/sprBg0.png')
-    this.load.image('sprBg1', 'content/sprBg1.png')
-    this.load.image('sprBtnPlay', 'content/sprBtnPlay.png')
-    this.load.image('sprBtnPlayHover', 'content/sprBtnPlayHover.png')
-    this.load.image('sprBtnPlayDown', 'content/sprBtnPlayDown.png')
-    this.load.image('sprBtnRestart', 'content/sprBtnRestart.png')
-    this.load.image('sprBtnRestartHover', 'content/sprBtnRestartHover.png')
-    this.load.image('sprBtnRestartDown', 'content/sprBtnRestartDown.png')
+    this.load.image('sprBg0', 'assets/images/sprBg0.png')
+    this.load.image('sprBg1', 'assets/images/sprBg1.png')
+    this.load.image('sprBtnPlay', 'assets/images/sprBtnPlay.png')
+    this.load.image('sprBtnPlayHover', 'assets/images/sprBtnPlayHover.png')
+    this.load.image('sprBtnPlayDown', 'assets/images/sprBtnPlayDown.png')
+    this.load.image('sprBtnRestart', 'assets/images/sprBtnRestart.png')
+    this.load.image('sprBtnRestartHover', 'assets/images/sprBtnRestartHover.png')
+    this.load.image('sprBtnRestartDown', 'assets/images/sprBtnRestartDown.png')
   }
 
   create () {
@@ -47,7 +49,7 @@ class SceneMainMenu extends Phaser.Scene {
       'pointerup',
       function () {
         this.btnPlay.setTexture('sprBtnPlay')
-        this.scene.start('SceneMain')
+        this.scene.start('GameScene')
       },
       this
     )

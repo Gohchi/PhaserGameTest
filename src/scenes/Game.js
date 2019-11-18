@@ -10,6 +10,7 @@ export default class extends Phaser.Scene {
   }
 
   create () {
+
     this.anims.create({
       key: 'sprExplosion',
       frames: this.anims.generateFrameNumbers('sprExplosion'),
@@ -35,8 +36,18 @@ export default class extends Phaser.Scene {
       this.game.config.height * 0.5,
       'player'
     )
+    // let player = this.player;
 
+    // this.enemyScale = this.add.text(10, 20, 'SCALE')
+    // this.enemyScaleValue = 0
+
+    // this.keyW = this.input.keyboard.addKeys(Phaser.Input.Keyboard.KeyCodes.W, Phaser.Input.Keyboard.KeyCodes.up)
     this.keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W)
+    this.keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q)
+    // this.keyW = this.input.keyboard.addKeys({
+    //   W: 'W',
+    //   up: 'up'
+    // })
     this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S)
     this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A)
     this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D)
@@ -44,6 +55,20 @@ export default class extends Phaser.Scene {
       Phaser.Input.Keyboard.KeyCodes.SPACE
     )
 
+    this.input.gamepad.start();
+
+    // To listen to buttons from a specific pad listen directly on that pad game.input.gamepad.padX, where X = pad 1-4
+    let pad1 = this.input.gamepad.pad1;
+
+
+    function dump() {
+
+      console.log(pad1._axes[0]);
+      console.log(pad1._rawPad.axes[0]);
+  
+  }
+    this.input.onDown.add(dump, this);
+    
     this.time.addEvent({
       delay: 1000,
       callback: function () {
@@ -66,13 +91,17 @@ export default class extends Phaser.Scene {
       loop: true
     })
 
-    this.physics.add.collider(this.playerLasers, this.enemies, function (
+    this.physics.add.collider(this.playerLasers, this.enemies, (
       playerLaser,
       enemy
-    ) {
+    ) => {
       if (enemy) {
         if (enemy.onDestroy !== undefined) {
           enemy.onDestroy()
+        }
+        if(!enemy.getData('isDead')){
+          this.player.setData('score', parseInt(this.player.getData('score') + 10 * enemy.scaleX))
+          // this.enemyScaleValue = enemy.scaleX
         }
         enemy.explode(true)
         playerLaser.destroy()
@@ -100,11 +129,20 @@ export default class extends Phaser.Scene {
         laser.destroy()
       }
     })
+    
+    this.score = this.add.text(10, 10, 'SCORE 0')
+    this.topScore = this.add.text(this.game.config.width * 0.5, 10, 'TOP SCORE 100000000000')
+    this.topScore.setOrigin(0.5, 0)
   }
 
   update () {
+    this.score.setText('SCORE ' + this.player.getData('score'))
+    // this.enemyScale.setText('SCALE ' + this.enemyScaleValue)
     if (!this.player.getData('isDead')) {
       this.player.update()
+      if(this.keyQ.isDown){
+        this.scene.start('SceneMainMenu')
+      }
       if (this.keyW.isDown) {
         this.player.moveUp()
       } else if (this.keyS.isDown) {
