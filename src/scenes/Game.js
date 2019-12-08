@@ -54,20 +54,6 @@ export default class extends Phaser.Scene {
     this.keySpace = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE
     )
-
-    this.input.gamepad.start();
-
-    // To listen to buttons from a specific pad listen directly on that pad game.input.gamepad.padX, where X = pad 1-4
-    let pad1 = this.input.gamepad.pad1;
-
-
-    function dump() {
-
-      console.log(pad1._axes[0]);
-      console.log(pad1._rawPad.axes[0]);
-  
-  }
-    this.input.onDown.add(dump, this);
     
     this.time.addEvent({
       delay: 1000,
@@ -136,6 +122,11 @@ export default class extends Phaser.Scene {
   }
 
   update () {
+    
+    let pad = this.input.gamepad.gamepads;
+
+    pad = pad.length ? pad[0] : this.defaultPad();
+    
     this.score.setText('SCORE ' + this.player.getData('score'))
     // this.enemyScale.setText('SCALE ' + this.enemyScaleValue)
     if (!this.player.getData('isDead')) {
@@ -143,18 +134,26 @@ export default class extends Phaser.Scene {
       if(this.keyQ.isDown){
         this.scene.start('SceneMainMenu')
       }
-      if (this.keyW.isDown) {
-        this.player.moveUp()
-      } else if (this.keyS.isDown) {
-        this.player.moveDown()
-      }
-      if (this.keyA.isDown) {
-        this.player.moveLeft()
-      } else if (this.keyD.isDown) {
-        this.player.moveRight()
+      if(pad.connected){
+        const speed = this.player.getData('speed');
+        let padx = pad.axes[0].getValue() * speed;
+        let pady = pad.axes[1].getValue() * speed;
+        // this.player.setPosition(this.player.x + padx, this.player.y + pady);
+        this.player.body.setVelocity(padx, pady);
+      } else {
+        if (this.keyW.isDown) {
+          this.player.moveUp()
+        } else if (this.keyS.isDown) {
+          this.player.moveDown()
+        }
+        if (this.keyA.isDown) {
+          this.player.moveLeft()
+        } else if (this.keyD.isDown) {
+          this.player.moveRight()
+        }
       }
 
-      if (this.keySpace.isDown) {
+      if (this.keySpace.isDown || pad.X) {
         this.player.setData('isShooting', true)
       } else {
         this.player.setData(
@@ -167,6 +166,12 @@ export default class extends Phaser.Scene {
 
     for (var i = 0; i < this.backgrounds.length; i++) {
       this.backgrounds[i].update()
+    }
+  }
+  defaultPad() {
+    return {
+      connected: false,
+      X: false
     }
   }
 }
